@@ -41,6 +41,11 @@ app.get("/db", async (req: Request, res: Response) => {
 app.post("/users", async (req: Request, res: Response) => {
   try {
     const { name, email } = req.body;
+
+    if (!name || !email) {
+      return res.status(400).send("Name and email are required");
+    }
+
     const newUser = await prisma.user.create({
       data: { name, email },
     });
