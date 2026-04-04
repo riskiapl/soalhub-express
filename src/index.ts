@@ -22,6 +22,8 @@ const prisma = new PrismaClient({
 const app = express();
 const port: number = Number(process.env.PORT) || 3000;
 
+app.use(express.json());
+
 app.get("/", (req: Request, res: Response) => {
   res.send("Halo! Ini server Express menggunakan TypeScript");
 });
@@ -33,6 +35,19 @@ app.get("/db", async (req: Request, res: Response) => {
   } catch (err) {
     console.error(err);
     res.status(500).send("Error mengakses database");
+  }
+});
+
+app.post("/users", async (req: Request, res: Response) => {
+  try {
+    const { name, email } = req.body;
+    const newUser = await prisma.user.create({
+      data: { name, email },
+    });
+    res.status(201).json(newUser);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Error membuat pengguna baru");
   }
 });
 
