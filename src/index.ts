@@ -1,11 +1,22 @@
 import "dotenv/config";
 import express, { type Request, type Response } from "express";
+import { PrismaClient } from "./generated/prisma/client.ts";
+import { PrismaPg } from "@prisma/adapter-pg";
 import pkg from "pg";
 
 const { Pool } = pkg;
 
+// Pastikan DATABASE_URL sudah diatur di file .env
+if (!process.env.DATABASE_URL) {
+  throw new Error("DATABASE_URL is missing in .env file");
+}
+
+// Inisialisasi Prisma Client dengan adapter PostgreSQL
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
+});
+const prisma = new PrismaClient({
+  adapter: new PrismaPg(pool),
 });
 
 const app = express();
@@ -17,10 +28,8 @@ app.get("/", (req: Request, res: Response) => {
 
 app.get("/db", async (req: Request, res: Response) => {
   try {
-    const client = await pool.connect();
-    const result = await client.query("SELECT NOW()");
-    res.json(result.rows[0]);
-    client.release();
+    const users = await prisma.user.findMany();
+    res.json(users);
   } catch (err) {
     console.error(err);
     res.status(500).send("Error mengakses database");

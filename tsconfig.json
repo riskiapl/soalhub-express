@@ -9,8 +9,13 @@
     // See also https://aka.ms/tsconfig/module
     "module": "nodenext",
     "moduleResolution": "nodenext",
+    "noEmit": true,
+    "allowImportingTsExtensions": true,
     "target": "esnext",
-    "types": [],
+    // "types": [],
+    // "skipDefaultLibCheck": true,
+    // "forceConsistentCasingInFileNames": true,
+
     // For nodejs:
     // "lib": ["esnext"],
     // "types": ["node"],
