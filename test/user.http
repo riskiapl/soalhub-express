@@ -1,5 +1,5 @@
-# @baseUrl = http://localhost:3000
-@baseUrl = https://api.soalhub.my.id
+@baseUrl = http://localhost:3000
+# @baseUrl = https://api.soalhub.my.id
 
 ### Create a new user
 POST {{baseUrl}}/users
@@ -9,3 +9,9 @@ Content-Type: application/json
   "name": "John Doe",
   "email": "john.doe@example.com"
 }
+
+### Get all users
+GET {{baseUrl}}/users
+
+### Delete a user by ID
+DELETE {{baseUrl}}/users/1
