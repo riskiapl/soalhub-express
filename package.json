@@ -8,8 +8,8 @@
     "start": "node dist/index.js",
     "dev": "nodemon --exec tsx src/index.ts",
     "build": "tsup src/index.ts --format esm --clean --minify --target node20",
-    "db:generate": "prisma generate",
-    "db:migrate": "prisma migrate dev"
+    "db:migrate": "prisma migrate dev",
+    "db:generate": "prisma generate"
   },
   "keywords": [],
   "author": "",
@@ -18,13 +18,19 @@
   "dependencies": {
     "@prisma/adapter-pg": "^7.6.0",
     "@prisma/client": "^7.6.0",
+    "bcrypt": "^6.0.0",
+    "date-fns": "^4.1.0",
     "dotenv": "^17.4.0",
     "express": "^5.2.1",
+    "express-rate-limit": "^8.3.2",
+    "nodemailer": "^8.0.4",
     "pg": "^8.20.0"
   },
   "devDependencies": {
+    "@types/bcrypt": "^6.0.0",
     "@types/express": "^5.0.6",
     "@types/node": "^25.5.2",
+    "@types/nodemailer": "^8.0.0",
     "@types/pg": "^8.20.0",
     "nodemon": "^3.1.14",
     "prisma": "^7.6.0",

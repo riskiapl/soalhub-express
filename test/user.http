@@ -7,7 +7,17 @@ Content-Type: application/json
 
 {
   "name": "John Doe",
-  "email": "john.doe@example.com"
+  "email": "john.doe@example.com",
+  "password": "password123"
+}
+
+### Update a user by ID
+PUT {{baseUrl}}/users/2
+Content-Type: application/json
+
+{
+  "email": "john.doe@example.com",
+  "code": "999411"
 }
 
 ### Get all users
