@@ -1,4 +1,5 @@
-@baseUrl = http://localhost:3000
+# @baseUrl = http://localhost:3000
+@baseUrl = https://api.soalhub.my.id
 
 ### Create a new user
 POST {{baseUrl}}/users

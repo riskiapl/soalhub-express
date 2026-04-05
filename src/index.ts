@@ -38,21 +38,34 @@ app.get("/db", async (req: Request, res: Response) => {
   }
 });
 
-app.post("/users", async (req: Request, res: Response) => {
+// app.post("/users", async (req: Request, res: Response) => {
+//   try {
+//     const { name, email } = req.body;
+
+//     if (!name || !email) {
+//       return res.status(400).send("Name and email are required");
+//     }
+
+//     const newUser = await prisma.user.create({
+//       data: { name, email },
+//     });
+//     res.status(201).json(newUser);
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).send("Error membuat pengguna baru");
+//   }
+// });
+
+app.delete("/users/:id", async (req: Request, res: Response) => {
   try {
-    const { name, email } = req.body;
-
-    if (!name || !email) {
-      return res.status(400).send("Name and email are required");
-    }
-
-    const newUser = await prisma.user.create({
-      data: { name, email },
+    const { id } = req.params;
+    const deletedUser = await prisma.user.delete({
+      where: { id: Number(id) },
     });
-    res.status(201).json(newUser);
+    res.json(deletedUser);
   } catch (err) {
     console.error(err);
-    res.status(500).send("Error membuat pengguna baru");
+    res.status(500).send("Error menghapus pengguna");
   }
 });
 
