@@ -1,5 +1,5 @@
-import { prisma } from "../config/db";
-import { hashPassword } from "../utils/hash";
+import { prisma } from '../config/db';
+import { hashPassword } from '../utils/hash';
 
 export const getAllUsers = async () => {
   return await prisma.user.findMany({
