@@ -33,16 +33,15 @@ export const createUser = async (
   });
 };
 
-export const updateUser = async (
-  id: number,
-  data: {
-    name?: string;
-    email?: string;
-    password?: string;
-    isActive?: boolean;
-  },
-) => {
-  const updateData: any = { ...data };
+interface UpdateData {
+  name?: string;
+  email?: string;
+  password?: string;
+  isActive?: boolean;
+}
+
+export const updateUser = async (id: number, data: UpdateData) => {
+  const updateData: UpdateData = { ...data };
   if (data.password) {
     updateData.password = await hashPassword(data.password);
   }
