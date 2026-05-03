@@ -1,10 +1,11 @@
 import { addMinutes, isAfter } from 'date-fns';
 import type { Request, Response } from 'express';
-import * as userService from '../services/user.service';
+import * as userService from '../../services/user/user.service';
 
 export const getUsers = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
+    const { limit, page } = req.query;
 
     if (id) {
       const user = await userService.getUserById(Number(id));
@@ -13,10 +14,14 @@ export const getUsers = async (req: Request, res: Response) => {
       }
       return res.status(200).json(user);
     } else {
-      const users = await userService.getAllUsers();
+      const users = await userService.getAllUsers({
+        limit: Number(limit || 10),
+        page: Number(page || 1),
+      });
       res.status(200).json(users);
     }
-  } catch (error: any) {
+  } catch (error) {
+    console.log(error, 'masuk error');
     res.status(500).json({ message: 'Failed to fetch users' });
   }
 };
@@ -53,14 +58,21 @@ export const registerUser = async (req: Request, res: Response) => {
       message: 'User successfully registered',
       data: user,
     });
-  } catch (error: any) {
+  } catch (error) {
     // Cek jika email duplikat (P2002 adalah kode error Prisma untuk unique constraint)
-    if (error.code === 'P2002') {
+    if (
+      typeof error === 'object' &&
+      error !== null &&
+      'code' in error &&
+      error.code === 'P2002'
+    ) {
       return res.status(409).json({ message: 'Email already registered' });
     }
+    const errorMessage =
+      error instanceof Error ? error.message : 'Unknown error';
     res
       .status(500)
-      .json({ message: 'Internal Server Error', error: error.message });
+      .json({ message: 'Internal Server Error', error: errorMessage });
   }
 };
 
@@ -114,10 +126,12 @@ export const updateUser = async (req: Request, res: Response) => {
         data: updatedUser,
       });
     }
-  } catch (error: any) {
+  } catch (error) {
+    const errorMessage =
+      error instanceof Error ? error.message : 'Unknown error';
     res
       .status(500)
-      .json({ message: 'Internal Server Error', error: error.message });
+      .json({ message: 'Internal Server Error', error: errorMessage });
   }
 };
 
@@ -134,9 +148,47 @@ export const deleteUser = async (req: Request, res: Response) => {
       message: 'User successfully deleted',
       data: deletedUser,
     });
-  } catch (error: any) {
+  } catch (error) {
+    const errorMessage =
+      error instanceof Error ? error.message : 'Unknown error';
     res
       .status(500)
-      .json({ message: 'Internal Server Error', error: error.message });
+      .json({ message: 'Internal Server Error', error: errorMessage });
+  }
+};
+
+export const resendOtp = async (req: Request, res: Response) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return res
+        .status(400)
+        .json({ message: 'Email is required for OTP verification' });
+    }
+
+    const user = await userService.getUserByEmail(email);
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    const otp = Math.floor(100000 + Math.random() * 900000).toString(); // Generate OTP 6 digit
+    const expiresAt = addMinutes(new Date(), 5); // OTP expires in 5 minutes
+    await userService.craeteOtp(email, otp, expiresAt);
+
+    res.status(200).json({
+      message: 'OTP successfully resent',
+      data: {
+        email,
+        expiresAt,
+      },
+    });
+  } catch (error) {
+    const errorMessage =
+      error instanceof Error ? error.message : 'Unknown error';
+    res
+      .status(500)
+      .json({ message: 'Internal Server Error', error: errorMessage });
   }
 };

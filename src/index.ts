@@ -1,6 +1,7 @@
+import express, { Router } from 'express';
 import 'dotenv/config';
-import express from 'express';
-import userRoutes from './routes/user.route';
+import adminRoutes from './routes/admin.routes';
+import userRoutes from './routes/user.routes';
 
 // Pastikan DATABASE_URL sudah diatur di file .env
 if (!process.env.DATABASE_URL) {
@@ -11,8 +12,13 @@ const app = express();
 const port: number = Number(process.env.PORT) || 3000;
 app.use(express.json());
 
+const v1Router = Router();
+
 // Routes
-app.use('/users', userRoutes);
+v1Router.use('/', userRoutes);
+v1Router.use('/admin', adminRoutes);
+
+app.use('/api/v1', v1Router);
 
 // Health Check Endpoint
 app.listen(port, () => {

@@ -4,8 +4,9 @@ import {
   deleteUser,
   getUsers,
   registerUser,
+  resendOtp,
   updateUser,
-} from '../controllers/user.controller';
+} from '../../controllers/user/user.controller';
 
 const router = Router();
 
@@ -26,8 +27,9 @@ const updateLimiter = rateLimit({
 });
 
 router.get('/', getUsers);
-router.get('/:id', getUsers); // Bisa digunakan untuk get user by id, tapi belum diimplementasikan di controller
+router.get('/:id', getUsers);
 router.post('/', registerLimiter, registerUser);
+router.post('/resend-otp', resendOtp);
 router.put('/:id', updateLimiter, updateUser);
 router.delete('/:id', deleteUser);
 

@@ -1,11 +1,28 @@
-import { prisma } from '../config/db';
-import { hashPassword } from '../utils/hash';
+import { prisma } from '../../config/db';
+import { hashPassword } from '../../utils/hash';
 
-export const getAllUsers = async () => {
-  return await prisma.user.findMany({
+export const getAllUsers = async ({
+  limit,
+  page,
+}: {
+  limit: number;
+  page: number;
+}) => {
+  const users = await prisma.user.findMany({
     where: { deletedAt: null, isActive: true },
-    take: 10,
+    take: limit,
+    skip: (page - 1) * limit,
   });
+
+  const totalData = await prisma.user.count({
+    where: { deletedAt: null, isActive: true },
+  });
+
+  return {
+    data: users,
+    totalData,
+    totalPages: Math.ceil(totalData / limit),
+  };
 };
 
 export const getUserById = async (id: number) => {
