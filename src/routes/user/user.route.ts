@@ -1,8 +1,7 @@
 import { Router } from 'express';
 import rateLimit from 'express-rate-limit';
 import {
-  deleteUser,
-  getUsers,
+  getUser,
   registerUser,
   resendOtp,
   updateUser,
@@ -26,11 +25,9 @@ const updateLimiter = rateLimit({
     'Too many update attempts from this IP, please try again after 15 minutes',
 });
 
-router.get('/', getUsers);
-router.get('/:id', getUsers);
+router.get('/:id', getUser);
 router.post('/', registerLimiter, registerUser);
 router.post('/resend-otp', resendOtp);
 router.put('/:id', updateLimiter, updateUser);
-router.delete('/:id', deleteUser);
 
 export default router;

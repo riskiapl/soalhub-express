@@ -2,27 +2,22 @@ import { addMinutes, isAfter } from 'date-fns';
 import type { Request, Response } from 'express';
 import * as userService from '../../services/user/user.service';
 
-export const getUsers = async (req: Request, res: Response) => {
+export const getUser = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const { limit, page } = req.query;
 
-    if (id) {
-      const user = await userService.getUserById(Number(id));
-      if (!user) {
-        return res.status(404).json({ message: 'User not found' });
-      }
-      return res.status(200).json(user);
-    } else {
-      const users = await userService.getAllUsers({
-        limit: Number(limit || 10),
-        page: Number(page || 1),
-      });
-      res.status(200).json(users);
+    if (!id) {
+      return res.status(400).json({ message: 'User ID is required' });
     }
+
+    const user = await userService.getUserById(Number(id));
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    return res.status(200).json(user);
   } catch (error) {
     console.log(error, 'masuk error');
-    res.status(500).json({ message: 'Failed to fetch users' });
+    res.status(500).json({ message: 'Failed to fetch user' });
   }
 };
 
@@ -126,28 +121,6 @@ export const updateUser = async (req: Request, res: Response) => {
         data: updatedUser,
       });
     }
-  } catch (error) {
-    const errorMessage =
-      error instanceof Error ? error.message : 'Unknown error';
-    res
-      .status(500)
-      .json({ message: 'Internal Server Error', error: errorMessage });
-  }
-};
-
-export const deleteUser = async (req: Request, res: Response) => {
-  try {
-    const { id } = req.params;
-    const deletedUser = await userService.deleteUser(Number(id));
-
-    if (!deletedUser) {
-      return res.status(404).json({ message: 'User not found' });
-    }
-
-    res.status(200).json({
-      message: 'User successfully deleted',
-      data: deletedUser,
-    });
   } catch (error) {
     const errorMessage =
       error instanceof Error ? error.message : 'Unknown error';
