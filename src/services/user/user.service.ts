@@ -48,12 +48,13 @@ export const updateUser = async (id: number, data: UpdateData) => {
 export const craeteOtp = async (
   email: string,
   code: string,
+  userId: number,
   expiresAt: Date,
 ) => {
   return await prisma.otp.upsert({
     where: { email },
-    update: { code, expiresAt },
-    create: { email, code, expiresAt },
+    update: { code, userId, expiresAt },
+    create: { email, code, userId, expiresAt },
   });
 };
 

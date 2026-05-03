@@ -1,6 +1,7 @@
 import { addMinutes, isAfter } from 'date-fns';
 import type { Request, Response } from 'express';
-import * as userService from '../../services/user/user.service';
+import * as userService from '@/services/user/user.service';
+import { catchErrorResponse } from '@/utils/response-handler';
 
 export const getUser = async (req: Request, res: Response) => {
   try {
@@ -16,8 +17,7 @@ export const getUser = async (req: Request, res: Response) => {
     }
     return res.status(200).json(user);
   } catch (error) {
-    console.log(error, 'masuk error');
-    res.status(500).json({ message: 'Failed to fetch user' });
+    catchErrorResponse(error, res);
   }
 };
 
@@ -47,27 +47,14 @@ export const registerUser = async (req: Request, res: Response) => {
 
     const otp = Math.floor(100000 + Math.random() * 900000).toString(); // Generate OTP 6 digit
     const expiresAt = addMinutes(new Date(), 5); // OTP expires in 5 minutes
-    await userService.craeteOtp(email, otp, expiresAt);
+    await userService.craeteOtp(email, otp, Number(user.id), expiresAt);
 
     res.status(201).json({
       message: 'User successfully registered',
       data: user,
     });
   } catch (error) {
-    // Cek jika email duplikat (P2002 adalah kode error Prisma untuk unique constraint)
-    if (
-      typeof error === 'object' &&
-      error !== null &&
-      'code' in error &&
-      error.code === 'P2002'
-    ) {
-      return res.status(409).json({ message: 'Email already registered' });
-    }
-    const errorMessage =
-      error instanceof Error ? error.message : 'Unknown error';
-    res
-      .status(500)
-      .json({ message: 'Internal Server Error', error: errorMessage });
+    catchErrorResponse(error, res);
   }
 };
 
@@ -122,11 +109,7 @@ export const updateUser = async (req: Request, res: Response) => {
       });
     }
   } catch (error) {
-    const errorMessage =
-      error instanceof Error ? error.message : 'Unknown error';
-    res
-      .status(500)
-      .json({ message: 'Internal Server Error', error: errorMessage });
+    catchErrorResponse(error, res);
   }
 };
 
@@ -148,7 +131,7 @@ export const resendOtp = async (req: Request, res: Response) => {
 
     const otp = Math.floor(100000 + Math.random() * 900000).toString(); // Generate OTP 6 digit
     const expiresAt = addMinutes(new Date(), 5); // OTP expires in 5 minutes
-    await userService.craeteOtp(email, otp, expiresAt);
+    await userService.craeteOtp(email, otp, Number(user.id), expiresAt);
 
     res.status(200).json({
       message: 'OTP successfully resent',
@@ -158,10 +141,43 @@ export const resendOtp = async (req: Request, res: Response) => {
       },
     });
   } catch (error) {
-    const errorMessage =
-      error instanceof Error ? error.message : 'Unknown error';
-    res
-      .status(500)
-      .json({ message: 'Internal Server Error', error: errorMessage });
+    catchErrorResponse(error, res);
+  }
+};
+
+export const verifyOtp = async (req: Request, res: Response) => {
+  try {
+    const { email, code } = req.body;
+
+    if (!email || !code) {
+      return res
+        .status(400)
+        .json({ message: 'Email and OTP code are required' });
+    }
+
+    const otpRecord = await userService.getOtpByEmail(email);
+
+    if (!otpRecord || otpRecord.code !== code) {
+      return res.status(400).json({ message: 'Invalid OTP code' });
+    }
+
+    if (isAfter(new Date(), otpRecord.expiresAt)) {
+      return res.status(400).json({ message: 'OTP code has expired' });
+    }
+
+    const updatedUser = await userService.updateUser(Number(otpRecord.userId), {
+      isActive: true,
+    });
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    res.status(200).json({
+      message: 'OTP verification successful',
+      data: updatedUser,
+    });
+  } catch (error) {
+    catchErrorResponse(error, res);
   }
 };

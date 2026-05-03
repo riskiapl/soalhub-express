@@ -28,6 +28,7 @@ model Otp {
   id        Int      @id @default(autoincrement())
   email     String   @unique
   code      String
+  userId    Int?
   expiresAt DateTime
   createdAt DateTime @default(now())
 }
