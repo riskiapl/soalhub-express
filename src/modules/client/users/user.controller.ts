@@ -1,4 +1,3 @@
-import { addMinutes, isAfter } from 'date-fns';
 import type { Request, Response } from 'express';
 import { catchErrorResponse } from '@/utils/response-handler';
 import * as userService from './user.service';
@@ -15,44 +14,8 @@ export const getUser = async (req: Request, res: Response) => {
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
+
     return res.status(200).json(user);
-  } catch (error) {
-    catchErrorResponse(error, res);
-  }
-};
-
-export const registerUser = async (req: Request, res: Response) => {
-  try {
-    const { name, email, password } = req.body;
-
-    if (!name || !email || !password) {
-      return res
-        .status(400)
-        .json({ message: 'Name, Email, and Password is required' });
-    }
-
-    if (password.length < 8) {
-      return res
-        .status(400)
-        .json({ message: 'Password must be at least 8 characters long' });
-    }
-
-    if (password.length > 30) {
-      return res
-        .status(400)
-        .json({ message: 'Maximum password length is 30 characters' });
-    }
-
-    const user = await userService.createUser(name, email, password);
-
-    const otp = Math.floor(100000 + Math.random() * 900000).toString(); // Generate OTP 6 digit
-    const expiresAt = addMinutes(new Date(), 5); // OTP expires in 5 minutes
-    await userService.craeteOtp(email, otp, Number(user.id), expiresAt);
-
-    res.status(201).json({
-      message: 'User successfully registered',
-      data: user,
-    });
   } catch (error) {
     catchErrorResponse(error, res);
   }
@@ -61,112 +24,19 @@ export const registerUser = async (req: Request, res: Response) => {
 export const updateUser = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const { name, email, password, code } = req.body;
 
-    if (code) {
-      if (!email) {
-        return res
-          .status(400)
-          .json({ message: 'Email is required for OTP verification' });
-      }
-
-      const otpRecord = await userService.getOtpByEmail(email);
-
-      if (!otpRecord || otpRecord.code !== code) {
-        return res.status(400).json({ message: 'Invalid OTP code' });
-      }
-
-      if (isAfter(new Date(), otpRecord.expiresAt)) {
-        return res.status(400).json({ message: 'OTP code has expired' });
-      }
-
-      const updatedUser = await userService.updateUser(Number(id), {
-        isActive: true,
-      });
-
-      if (!updatedUser) {
-        return res.status(404).json({ message: 'User not found' });
-      }
-
-      res.status(200).json({
-        message: 'User successfully updated',
-        data: updatedUser,
-      });
-    } else {
-      const updatedUser = await userService.updateUser(Number(id), {
-        name,
-        email,
-        password,
-      });
-
-      if (!updatedUser) {
-        return res.status(404).json({ message: 'User not found' });
-      }
-
-      res.status(200).json({
-        message: 'User successfully updated',
-        data: updatedUser,
-      });
-    }
-  } catch (error) {
-    catchErrorResponse(error, res);
-  }
-};
-
-export const resendOtp = async (req: Request, res: Response) => {
-  try {
-    const { email } = req.body;
-
-    if (!email) {
+    if (req.user?.userId !== Number(id)) {
       return res
-        .status(400)
-        .json({ message: 'Email is required for OTP verification' });
+        .status(403)
+        .json({ message: 'Forbidden: You can only update your own profile' });
     }
 
-    const user = await userService.getUserByEmail(email);
+    const { name, email, password } = req.body;
 
-    if (!user) {
-      return res.status(404).json({ message: 'User not found' });
-    }
-
-    const otp = Math.floor(100000 + Math.random() * 900000).toString(); // Generate OTP 6 digit
-    const expiresAt = addMinutes(new Date(), 5); // OTP expires in 5 minutes
-    await userService.craeteOtp(email, otp, Number(user.id), expiresAt);
-
-    res.status(200).json({
-      message: 'OTP successfully resent',
-      data: {
-        email,
-        expiresAt,
-      },
-    });
-  } catch (error) {
-    catchErrorResponse(error, res);
-  }
-};
-
-export const verifyOtp = async (req: Request, res: Response) => {
-  try {
-    const { email, code } = req.body;
-
-    if (!email || !code) {
-      return res
-        .status(400)
-        .json({ message: 'Email and OTP code are required' });
-    }
-
-    const otpRecord = await userService.getOtpByEmail(email);
-
-    if (!otpRecord || otpRecord.code !== code) {
-      return res.status(400).json({ message: 'Invalid OTP code' });
-    }
-
-    if (isAfter(new Date(), otpRecord.expiresAt)) {
-      return res.status(400).json({ message: 'OTP code has expired' });
-    }
-
-    const updatedUser = await userService.updateUser(Number(otpRecord.userId), {
-      isActive: true,
+    const updatedUser = await userService.updateUser(Number(id), {
+      name,
+      email,
+      password,
     });
 
     if (!updatedUser) {
@@ -174,7 +44,7 @@ export const verifyOtp = async (req: Request, res: Response) => {
     }
 
     res.status(200).json({
-      message: 'OTP verification successful',
+      message: 'User successfully updated',
       data: updatedUser,
     });
   } catch (error) {

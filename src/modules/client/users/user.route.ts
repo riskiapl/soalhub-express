@@ -1,19 +1,11 @@
 import { Router } from 'express';
-import { authLimiter } from '@/utils/rate-limit';
-import {
-  getUser,
-  registerUser,
-  resendOtp,
-  updateUser,
-  verifyOtp,
-} from './user.controller';
+import { authenticateUser } from '@/middlewares/auth.middleware';
+import { getUser, updateUser } from './user.controller';
 
 const router = Router();
 
-router.get('/:id', getUser);
-router.post('/', authLimiter, registerUser);
-router.post('/resend-otp', authLimiter, resendOtp);
-router.post('/verify-otp', authLimiter, verifyOtp);
-router.put('/:id', authLimiter, updateUser);
+// Rute ini nanti terdaftar sebagai /api/v1/users/
+router.get('/:id', authenticateUser, getUser);
+router.put('/:id', authenticateUser, updateUser);
 
 export default router;

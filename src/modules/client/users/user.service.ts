@@ -7,20 +7,22 @@ export const getUserById = async (id: number) => {
   });
 };
 
+// Hanya mengambil user yang sudah aktif (untuk login/profil)
 export const getUserByEmail = async (email: string) => {
   return await prisma.user.findUnique({
     where: { email, deletedAt: null, isActive: true },
   });
 };
 
-export const createUser = async (
-  name: string,
-  email: string,
-  password: string,
-) => {
-  // Hash password sebelum disimpan ke database
-  const hashedPassword = await hashPassword(password);
+// Fungsi baru: Mengambil user meskipun belum aktif (dibutuhkan oleh resend-otp)
+export const getAnyUserByEmail = async (email: string) => {
+  return await prisma.user.findUnique({
+    where: { email, deletedAt: null },
+  });
+};
 
+export const createUser = async (name: string, email: string, password: string) => {
+  const hashedPassword = await hashPassword(password);
   return await prisma.user.create({
     data: { name, email, password: hashedPassword },
   });
@@ -42,24 +44,5 @@ export const updateUser = async (id: number, data: UpdateData) => {
   return await prisma.user.update({
     where: { id },
     data: updateData,
-  });
-};
-
-export const craeteOtp = async (
-  email: string,
-  code: string,
-  userId: number,
-  expiresAt: Date,
-) => {
-  return await prisma.otp.upsert({
-    where: { email },
-    update: { code, userId, expiresAt },
-    create: { email, code, userId, expiresAt },
-  });
-};
-
-export const getOtpByEmail = async (email: string) => {
-  return await prisma.otp.findUnique({
-    where: { email },
   });
 };

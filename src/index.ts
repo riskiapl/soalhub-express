@@ -16,6 +16,9 @@ app.use(express.json());
 // Health Check Endpoint
 app.get('/health', (_req, res) => res.status(200).json({ status: 'OK' }));
 
+// Trust Proxy (untuk mendukung rate limiting di belakang reverse proxy)
+app.set('trust proxy', 1);
+
 // API Versioning
 app.use('/api/v1', v1Router);
 

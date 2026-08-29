@@ -3,7 +3,8 @@ import bcrypt from 'bcrypt';
 const SALT_ROUNDS = 10; // Standar keamanan yang seimbang antara speed & security
 
 export const hashPassword = async (password: string): Promise<string> => {
-  return await bcrypt.hash(password, SALT_ROUNDS);
+  const salt = await bcrypt.genSalt(SALT_ROUNDS);
+  return await bcrypt.hash(password, salt);
 };
 
 export const comparePassword = async (
