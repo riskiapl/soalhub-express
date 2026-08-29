@@ -9,13 +9,13 @@ export const getAllUsers = async ({
   page: number;
 }) => {
   const users = await prisma.user.findMany({
-    where: { deletedAt: null, isActive: true },
+    where: { deletedAt: null },
     take: limit,
     skip: (page - 1) * limit,
   });
 
   const totalData = await prisma.user.count({
-    where: { deletedAt: null, isActive: true },
+    where: { deletedAt: null },
   });
 
   return {
@@ -27,7 +27,7 @@ export const getAllUsers = async ({
 
 export const getUserById = async (id: number) => {
   return await prisma.user.findUnique({
-    where: { id, deletedAt: null, isActive: true },
+    where: { id, deletedAt: null },
   });
 };
 
@@ -64,7 +64,8 @@ export const updateUser = async (id: number, data: UpdateData) => {
 };
 
 export const deleteUser = async (id: number) => {
-  return await prisma.user.delete({
-    where: { id, deletedAt: null, isActive: true },
+  return await prisma.user.update({
+    where: { id },
+    data: { deletedAt: new Date(), isActive: false },
   });
 };

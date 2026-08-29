@@ -1,4 +1,5 @@
 import type { Request, Response } from 'express';
+import { catchErrorResponse } from '@/utils/response-handler';
 import * as adminUserService from './user.service';
 
 export const getUser = async (req: Request, res: Response) => {
@@ -15,29 +16,20 @@ export const getUser = async (req: Request, res: Response) => {
     console.log(error, 'masuk error');
     res.status(500).json({ message: 'Failed to fetch user' });
   }
-}
+};
 
 export const getUsers = async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
     const { limit, page } = req.query;
 
-    if (id) {
-      const user = await adminUserService.getUserById(Number(id));
-      if (!user) {
-        return res.status(404).json({ message: 'User not found' });
-      }
-      return res.status(200).json(user);
-    } else {
-      const users = await adminUserService.getAllUsers({
-        limit: Number(limit || 10),
-        page: Number(page || 1),
-      });
-      res.status(200).json(users);
-    }
+    const users = await adminUserService.getAllUsers({
+      limit: Number(limit || 10),
+      page: Number(page || 1),
+    });
+    res.status(200).json(users);
   } catch (error) {
     console.log(error, 'masuk error');
-    res.status(500).json({ message: 'Failed to fetch users' });
+    catchErrorResponse(error, res);
   }
 };
 

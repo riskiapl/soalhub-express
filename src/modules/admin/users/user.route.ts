@@ -1,4 +1,6 @@
 import { Router } from 'express';
+import { verifyAdmin } from '@/middlewares/admin.middleware';
+import { authenticateUser } from '@/middlewares/auth.middleware';
 import {
   createUser,
   deleteUser,
@@ -8,6 +10,8 @@ import {
 } from './user.controller';
 
 const router = Router();
+
+router.use(authenticateUser, verifyAdmin);
 
 router.get('/', getUsers);
 router.get('/:id', getUser);
