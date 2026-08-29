@@ -1,0 +1,27 @@
+{
+  // Menjadikan Biome sebagai formatter utama untuk proyek ini
+  "editor.defaultFormatter": "biomejs.biome",
+  
+  // Mengaktifkan format otomatis saat file disave
+  "editor.formatOnSave": true,
+  
+  // Menjalankan auto-fix linter dan merapikan import saat file disave
+  "editor.codeActionsOnSave": {
+    "source.fixAll.biome": "explicit",
+    "source.organizeImports.biome": "explicit"
+  },
+
+  // (Opsional) Memastikan file spesifik ditangani oleh Biome
+  "[javascript]": {
+    "editor.defaultFormatter": "biomejs.biome"
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "biomejs.biome"
+  },
+  "[json]": {
+    "editor.defaultFormatter": "biomejs.biome"
+  },
+  "[jsonc]": {
+    "editor.defaultFormatter": "biomejs.biome"
+  }
+}

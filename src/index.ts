@@ -1,7 +1,6 @@
-import express, { Router } from 'express';
+import express from 'express';
 import 'dotenv/config';
-import adminRoutes from './routes/admin.routes';
-import userRoutes from './routes/user.routes';
+import v1Router from './routes/v1';
 
 // Pastikan DATABASE_URL sudah diatur di file .env
 if (!process.env.DATABASE_URL) {
@@ -10,17 +9,17 @@ if (!process.env.DATABASE_URL) {
 
 const app = express();
 const port: number = Number(process.env.PORT) || 3000;
+
+// Middleware Global
 app.use(express.json());
 
-const v1Router = Router();
+// Health Check Endpoint
+app.get('/health', (_req, res) => res.status(200).json({ status: 'OK' }));
 
-// Routes
-v1Router.use('/', userRoutes);
-v1Router.use('/admin', adminRoutes);
-
+// API Versioning
 app.use('/api/v1', v1Router);
 
-// Health Check Endpoint
+// Start the server
 app.listen(port, () => {
   console.log(`⚡️ Server berjalan di http://localhost:${port}`);
 });

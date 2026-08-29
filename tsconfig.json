@@ -1,5 +1,4 @@
 {
-  // Visit https://aka.ms/tsconfig to read more about this file
   "compilerOptions": {
     "target": "esnext",
     "module": "esnext",
@@ -24,9 +23,10 @@
     "noUncheckedSideEffectImports": true,
     "moduleDetection": "force",
     "skipLibCheck": true,
-    "baseUrl": "./src",
+
+    // Ganti konfigurasi path alias ke format relatif modern:
     "paths": {
-      "@/*": ["*"]
+      "@/*": ["./src/*"]
     }
   }
 }
