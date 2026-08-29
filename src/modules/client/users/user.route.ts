@@ -1,12 +1,12 @@
 import { Router } from 'express';
+import { authLimiter } from '@/utils/rate-limit';
 import {
   getUser,
   registerUser,
   resendOtp,
   updateUser,
   verifyOtp,
-} from '@/controllers/user/user.controller';
-import { authLimiter } from '@/utils/rate-limit';
+} from './user.controller';
 
 const router = Router();
 

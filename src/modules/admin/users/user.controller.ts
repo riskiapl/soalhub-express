@@ -1,5 +1,21 @@
 import type { Request, Response } from 'express';
-import * as adminUserService from '../../services/admin/user.service';
+import * as adminUserService from './user.service';
+
+export const getUser = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const user = await adminUserService.getUserById(Number(id));
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    res.status(200).json(user);
+  } catch (error) {
+    console.log(error, 'masuk error');
+    res.status(500).json({ message: 'Failed to fetch user' });
+  }
+}
 
 export const getUsers = async (req: Request, res: Response) => {
   try {

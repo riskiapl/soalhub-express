@@ -2,7 +2,7 @@
 # @baseUrl = https://api.soalhub.my.id
 
 ### Create a new user
-POST {{baseUrl}}/users
+POST {{baseUrl}}/api/v1/user
 Content-Type: application/json
 
 {
@@ -12,7 +12,7 @@ Content-Type: application/json
 }
 
 ### Update a user by ID
-PUT {{baseUrl}}/users/2
+PUT {{baseUrl}}/api/v1/user/2
 Content-Type: application/json
 
 {

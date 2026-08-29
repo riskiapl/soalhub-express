@@ -1,7 +1,7 @@
 import { addMinutes, isAfter } from 'date-fns';
 import type { Request, Response } from 'express';
-import * as userService from '@/services/user/user.service';
 import { catchErrorResponse } from '@/utils/response-handler';
+import * as userService from './user.service';
 
 export const getUser = async (req: Request, res: Response) => {
   try {

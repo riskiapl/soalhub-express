@@ -2,14 +2,14 @@
   "name": "soalhub-express",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "src/index.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node dist/index.js",
-    "dev": "nodemon --exec tsx src/index.ts",
-    "build": "tsup src/index.ts --format esm --clean --minify --target node20",
-    "db:migrate": "prisma migrate dev",
-    "db:generate": "prisma generate"
+    "start": "bun src/index.ts",
+    "dev": "bun --watch src/index.ts",
+    "build": "bun build src/index.ts --outdir ./dist --target bun",
+    "db:migrate": "bunx prisma migrate dev",
+    "db:generate": "bunx prisma generate"
   },
   "keywords": [],
   "author": "",
@@ -33,11 +33,7 @@
     "@types/node": "^25.5.2",
     "@types/nodemailer": "^8.0.0",
     "@types/pg": "^8.20.0",
-    "nodemon": "^3.1.14",
     "prisma": "^7.6.0",
-    "ts-node": "^10.9.2",
-    "tsup": "^8.5.1",
-    "tsx": "^4.21.0",
     "typescript": "^6.0.2"
   }
 }
